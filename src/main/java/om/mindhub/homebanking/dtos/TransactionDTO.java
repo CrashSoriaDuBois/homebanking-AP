@@ -1,8 +1,7 @@
-package com.homebanking.homebanking.dtos;
+package om.mindhub.homebanking.dtos;
 
-import com.homebanking.homebanking.models.Transaction;
-import com.homebanking.homebanking.models.TransactionType;
-
+import om.mindhub.homebanking.models.Transaction;
+import om.mindhub.homebanking.models.TransactionType;
 
 import java.time.LocalDateTime;
 

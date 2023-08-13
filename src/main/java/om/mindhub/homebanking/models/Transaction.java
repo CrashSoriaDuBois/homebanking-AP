@@ -1,6 +1,7 @@
-package com.homebanking.homebanking.models;
+package om.mindhub.homebanking.models;
 
 import org.hibernate.annotations.GenericGenerator;
+
 import javax.persistence.*;
 import java.time.LocalDateTime;
 

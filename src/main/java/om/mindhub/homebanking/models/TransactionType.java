@@ -1,4 +1,4 @@
-package com.homebanking.homebanking.models;
+package om.mindhub.homebanking.models;
 
 
 
