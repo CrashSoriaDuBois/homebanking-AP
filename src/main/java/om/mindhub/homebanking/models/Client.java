@@ -4,14 +4,17 @@ import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+
+import static java.util.stream.Collectors.toList;
 
 @Entity
 public class Client {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO, generator = "native")
     @GenericGenerator(name = "native", strategy = "native")
-    private long id;
+    private long id; //
     private String firstName;
     private String lastName;
     private String email;
@@ -27,6 +30,9 @@ public class Client {
     }
     @OneToMany(mappedBy="client", fetch= FetchType.EAGER)
     Set<Account> accounts = new HashSet<>();
+
+    @OneToMany(mappedBy="client", fetch=FetchType.EAGER)
+    Set<ClientLoan> clientLoans = new HashSet<>();
     public long getId() {
         return id;
     }
@@ -50,6 +56,18 @@ public class Client {
         account.setClient(this);
         accounts.add(account);
     }
+    public Set<ClientLoan> getClientLoans() {
+        return clientLoans;
+    }
+    public void addClientLoan(ClientLoan clientLoan) {
+        clientLoan.setClient(this);
+        clientLoans.add(clientLoan);
+    }
+
+    public List<Loan> getLoans(){
+        return clientLoans.stream().map(ClientLoan::getLoan).collect(toList());
+    }
+
 
     public void setLastName(String lastName) {
         this.lastName = lastName;

@@ -1,4 +1,4 @@
-package om.mindhub.homebanking.models;
+package om.mindhub.homebanking.enums;
 
 
 

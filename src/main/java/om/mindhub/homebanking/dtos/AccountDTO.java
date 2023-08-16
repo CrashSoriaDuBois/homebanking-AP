@@ -8,11 +8,11 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 public class AccountDTO {
-    public long id;
+    private long id;
 
-    public String number;
-    public LocalDate creationDate;
-    public double balance;
+    private String number;
+    private LocalDate creationDate;
+    private double balance;
 
     private Set<TransactionDTO> transactions;
 
@@ -29,39 +29,23 @@ public class AccountDTO {
         return id;
     }
 
-    public void setId(long id) {
-        this.id = id;
-    }
-
     public String getNumber() {
         return number;
     }
 
-    public void setNumber(String number) {
-        this.number = number;
-    }
 
     public LocalDate getCreationDate() {
         return creationDate;
     }
 
-    public void setCreationDate(LocalDate creationDate) {
-        this.creationDate = creationDate;
-    }
 
     public double getBalance() {
         return balance;
     }
 
-    public void setBalance(double balance) {
-        this.balance = balance;
-    }
 
     public Set<TransactionDTO> getTransactions() {
         return transactions;
     }
 
-    public void setTransactions(Set<TransactionDTO> transactions) {
-        this.transactions = transactions;
-    }
 }

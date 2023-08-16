@@ -1,5 +1,6 @@
 package om.mindhub.homebanking.models;
 
+import om.mindhub.homebanking.enums.TransactionType;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
