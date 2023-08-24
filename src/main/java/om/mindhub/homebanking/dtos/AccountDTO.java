@@ -4,14 +4,15 @@ import om.mindhub.homebanking.models.Account;
 import om.mindhub.homebanking.models.Client;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 public class AccountDTO {
-    private long id;
+    private Long id;
 
     private String number;
-    private LocalDate creationDate;
+    private LocalDateTime creationDate;
     private double balance;
 
     private Set<TransactionDTO> transactions;
@@ -25,7 +26,7 @@ public class AccountDTO {
         this.transactions = account.getTransactions().stream().map(TransactionDTO::new).collect(Collectors.toSet());
     }
 
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
@@ -34,7 +35,7 @@ public class AccountDTO {
     }
 
 
-    public LocalDate getCreationDate() {
+    public LocalDateTime getCreationDate() {
         return creationDate;
     }
 

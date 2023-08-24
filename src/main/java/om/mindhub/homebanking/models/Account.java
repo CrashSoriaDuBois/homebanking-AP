@@ -5,6 +5,7 @@ import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
@@ -14,9 +15,9 @@ public class Account {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO, generator = "native")
     @GenericGenerator(name = "native", strategy = "native")
-    private long accountID;
+    private Long accountID;
     private String number;
-    private LocalDate creationDate;
+    private LocalDateTime creationDate;
     private double balance;
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name="client_id")
@@ -35,14 +36,14 @@ public class Account {
         this.client = client;
     }
 
-    public Account(String number, LocalDate creationDate, double balance) {
+    public Account(String number, LocalDateTime creationDate, double balance) {
 
         this.number = number;
         this.creationDate = creationDate;
         this.balance = balance;
     }
 
-    public long getAccountID() {
+    public Long getAccountID() {
         return accountID;
     }
 
@@ -54,11 +55,11 @@ public class Account {
         this.number = number;
     }
 
-    public LocalDate getCreationDate() {
+    public LocalDateTime getCreationDate() {
         return creationDate;
     }
 
-    public void setCreationDate(LocalDate creationDate) {
+    public void setCreationDate(LocalDateTime creationDate) {
         this.creationDate = creationDate;
     }
 

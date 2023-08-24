@@ -1,16 +1,18 @@
 package om.mindhub.homebanking;
 
-import om.mindhub.homebanking.dtos.AccountDTO;
 import om.mindhub.homebanking.enums.CardColor;
 import om.mindhub.homebanking.enums.CardType;
 import om.mindhub.homebanking.models.*;
 import om.mindhub.homebanking.enums.TransactionType;
 import om.mindhub.homebanking.repositories.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.net.Authenticator;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -23,6 +25,9 @@ public class HomebankingApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(HomebankingApplication.class, args);
 	}
+
+	@Autowired
+	private PasswordEncoder passwordEncoder;
 	@Bean
 	public CommandLineRunner initData(ClientRepository clientRepository,
 									  AccountRepository accountRepository,
@@ -31,9 +36,9 @@ public class HomebankingApplication {
 									  ClientLoanRepository clientLoanRepository,
 									  CardRepository cardRepository){
 		return (args -> {
-			Client client1 = new Client("Melba", "Morel", "melba@mindhub.com");
-			Account account1 = new Account("VIN001", LocalDate.now(),5000 );
-			Account account2 = new Account("VIN002", (LocalDate.now()).plusDays(1),7500 );
+			Client client1 = new Client("Melba", "Morel", "melba@mindhub.com", passwordEncoder.encode("melba"));
+			Account account1 = new Account("VIN001", LocalDateTime.now(),5000 );
+			Account account2 = new Account("VIN002", (LocalDateTime.now()).plusDays(1),7500 );
 
 			client1.addAccounts(account1);
 			client1.addAccounts(account2);
@@ -41,10 +46,12 @@ public class HomebankingApplication {
 			accountRepository.save(account1);
 			accountRepository.save(account2);
 
-			Client client2 = new Client("Ines", "Risotto", "inessirotto@gmail.com");
-			Account account3 = new Account("VIN003", LocalDate.now(),2500 );
-			Account account4 = new Account("VIN004", (LocalDate.now()).plusDays(1),1000 );
+			Client client2 = new Client("Ines", "Risotto", "inessirotto@gmail.com", passwordEncoder.encode("melba"));
+			Account account3 = new Account("VIN003", LocalDateTime.now(),2500 );
+			Account account4 = new Account("VIN004", (LocalDateTime.now()).plusDays(1),1000 );
 
+			Client client3 = new Client("Admin", "Admin", "admin@hotmail.com", passwordEncoder.encode("admin"));
+			clientRepository.save(client3);
 
 			client2.addAccounts(account3);
 			client2.addAccounts(account4);
@@ -57,6 +64,8 @@ public class HomebankingApplication {
 
 			Transaction transaction2 = new Transaction(TransactionType.CREDIT,5000,"other description",LocalDateTime.now(),account2);
 			transactionRepository.save(transaction2);
+
+
 
 			//
 			Loan loan1 = new Loan("Mortgage", 500000, List.of(12,24,36,48,60));

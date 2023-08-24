@@ -8,7 +8,7 @@ import java.util.stream.Collectors;
 import static java.util.stream.Collectors.toSet;
 
 public class ClienDTO {
-    private long id;
+    private Long id;
     private String firstName;
     private String lastName;
     private String email;
@@ -33,7 +33,7 @@ public class ClienDTO {
         this.cards = client.getCards().stream().map(CardDTO::new).collect(toSet());
     }
 
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
