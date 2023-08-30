@@ -20,6 +20,14 @@ public class Client {
     private String email;
     private String password;
 
+    @OneToMany(mappedBy="client", fetch= FetchType.EAGER)
+    Set<Account> accounts = new HashSet<>();
+
+    @OneToMany(mappedBy="client", fetch=FetchType.EAGER)
+    Set<ClientLoan> clientLoans = new HashSet<>();
+
+    @OneToMany(mappedBy="client", fetch=FetchType.EAGER)
+    private Set<Card> cards = new HashSet<>();
     public Client() {
     }
 
@@ -30,14 +38,7 @@ public class Client {
         this.email = email;
         this.password = password;
     }
-    @OneToMany(mappedBy="client", fetch= FetchType.EAGER)
-    Set<Account> accounts = new HashSet<>();
 
-    @OneToMany(mappedBy="client", fetch=FetchType.EAGER)
-    Set<ClientLoan> clientLoans = new HashSet<>();
-
-    @OneToMany(mappedBy="client", fetch=FetchType.EAGER)
-    private Set<Card> cards = new HashSet<>();
     public Long getId() {
         return id;
     }
@@ -52,6 +53,25 @@ public class Client {
 
     public String getLastName() {
         return lastName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public Set<Account> getAccounts() {
@@ -71,26 +91,6 @@ public class Client {
 
     public List<Loan> getLoans(){
         return clientLoans.stream().map(ClientLoan::getLoan).collect(toList());
-    }
-
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
     }
 
     public Set<Card> getCards() {

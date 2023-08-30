@@ -41,7 +41,6 @@ public class Transaction {
     public TransactionType getType() {
         return type;
     }
-
     public void setType(TransactionType type) {
         this.type = type;
     }
@@ -49,7 +48,6 @@ public class Transaction {
     public double getAmount() {
         return amount;
     }
-
     public void setAmount(double amount) {
         this.amount = amount;
     }
@@ -57,7 +55,6 @@ public class Transaction {
     public String getDescription() {
         return description;
     }
-
     public void setDescription(String description) {
         this.description = description;
     }
@@ -65,8 +62,14 @@ public class Transaction {
     public LocalDateTime getDate() {
         return date;
     }
-
     public void setDate(LocalDateTime date) {
         this.date = date;
+    }
+
+    public Account getAccount() {
+        return account;
+    }
+    public void setAccount(Account account) {
+        this.account = account;
     }
 }

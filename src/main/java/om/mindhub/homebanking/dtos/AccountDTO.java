@@ -16,8 +16,6 @@ public class AccountDTO {
     private double balance;
 
     private Set<TransactionDTO> transactions;
-
-    public AccountDTO(){}
     public AccountDTO(Account account){
         this.id = account.getAccountID();
         this.number = account.getNumber();
@@ -39,11 +37,9 @@ public class AccountDTO {
         return creationDate;
     }
 
-
     public double getBalance() {
         return balance;
     }
-
 
     public Set<TransactionDTO> getTransactions() {
         return transactions;

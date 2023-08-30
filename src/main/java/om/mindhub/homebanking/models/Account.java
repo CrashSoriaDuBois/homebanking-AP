@@ -27,15 +27,6 @@ public class Account {
     public Account() {
     }
 
-   // @JsonIgnore
-    public Client getClient() {
-        return client;
-    }
-
-    public void setClient(Client client) {
-        this.client = client;
-    }
-
     public Account(String number, LocalDateTime creationDate, double balance) {
 
         this.number = number;
@@ -50,7 +41,6 @@ public class Account {
     public String getNumber() {
         return number;
     }
-
     public void setNumber(String number) {
         this.number = number;
     }
@@ -58,7 +48,6 @@ public class Account {
     public LocalDateTime getCreationDate() {
         return creationDate;
     }
-
     public void setCreationDate(LocalDateTime creationDate) {
         this.creationDate = creationDate;
     }
@@ -66,17 +55,25 @@ public class Account {
     public double getBalance() {
         return balance;
     }
-
     public void setBalance(double balance) {
         this.balance = balance;
+    }
+
+    // @JsonIgnore
+    public Client getClient() {
+        return client;
+    }
+    public void setClient(Client client) {
+        this.client = client;
     }
 
     public Set<Transaction> getTransactions() {
         return transactions;
     }
 
-    public void setTransactions(Set<Transaction> transactions) {
-        this.transactions = transactions;
+    public void addTransactions(Transaction transaction) {
+        transaction.setAccount(this);
+        transactions.add(transaction);
     }
 
     @Override

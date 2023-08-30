@@ -14,25 +14,26 @@ import java.util.List;
 import static java.util.stream.Collectors.toList;
 
 @RestController
-@RequestMapping(value = "/api")
+@RequestMapping(value = "api")
 public class ClientController {
     @Autowired
-    private ClientRepository repo;
+    private ClientRepository cLrepo;
     @Autowired
     private PasswordEncoder passwordEncoder;
 
     @RequestMapping("/clients")
     public List<ClienDTO> getClients() {
-        return repo.findAll().stream().map(client -> new ClienDTO(client)).collect(toList());
+        return cLrepo.findAll().stream().map(client -> new ClienDTO(client)).collect(toList());
     }
 
     @RequestMapping("/clients/{id}")
     public ClienDTO getClient(@PathVariable Long id){
-        return repo.findById(id).map(ClienDTO::new).orElse(null);
+
+        return cLrepo.findById(id).map(ClienDTO::new).orElse(null);
     }
     @RequestMapping("/clients/current")
     public ClienDTO getClient(Authentication authentication){
-        return new ClienDTO(repo.findByEmail(authentication.getName()));
+        return new ClienDTO(cLrepo.findByEmail(authentication.getName()));
     }
     @RequestMapping(path = "/clients", method = RequestMethod.POST)
     public ResponseEntity<Object> register(
@@ -41,10 +42,10 @@ public class ClientController {
         if (firstName.isEmpty() || lastName.isEmpty() || email.isEmpty() || password.isEmpty()) {
             return new ResponseEntity<>("Missing data", HttpStatus.FORBIDDEN);
         }
-        if (repo.findByEmail(email) != null) {
+        if (cLrepo.findByEmail(email) != null) {
             return new ResponseEntity<>("Name already in use", HttpStatus.FORBIDDEN);
         }
-        repo.save(new Client(firstName, lastName, email, passwordEncoder.encode(password)));
+        cLrepo.save(new Client(firstName, lastName, email, passwordEncoder.encode(password)));
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 }

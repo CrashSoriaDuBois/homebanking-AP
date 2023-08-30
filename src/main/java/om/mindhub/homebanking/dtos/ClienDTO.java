@@ -15,7 +15,6 @@ public class ClienDTO {
     private Set<AccountDTO> accounts;
     private Set<ClientLoanDTO> loans;
     private Set<CardDTO> cards;
-    public ClienDTO(){}
     public ClienDTO(Client client) {
 
         this.id = client.getId();
@@ -40,8 +39,6 @@ public class ClienDTO {
     public String getFirstName() {
         return firstName;
     }
-
-
     public String getLastName() {
         return lastName;
     }

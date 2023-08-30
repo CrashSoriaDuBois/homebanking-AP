@@ -61,9 +61,11 @@ public class HomebankingApplication {
 
 			Transaction transaction1 = new Transaction(TransactionType.DEBIT,5000,"description", LocalDateTime.now(),account1);
 			transactionRepository.save(transaction1);
+			account1.addTransactions(transaction1);
 
 			Transaction transaction2 = new Transaction(TransactionType.CREDIT,5000,"other description",LocalDateTime.now(),account2);
 			transactionRepository.save(transaction2);
+			account2.addTransactions(transaction2);
 
 
 
@@ -103,9 +105,9 @@ public class HomebankingApplication {
 			clientLoanRepository.save(clientLoan3);
 			clientLoanRepository.save(clientLoan4);
 
-			Card card1 = new Card(client1.getFirstName()+" "+client1.getLastName(), CardType.DEBIT, CardColor.GOLD,"2316-5416-3854-2184",970,LocalDateTime.now(),LocalDateTime.now().plusYears(5));
-			Card card2 = new Card(client1.getFirstName()+" "+client1.getLastName(),CardType.CREDIT, CardColor.TITANIUM,"5423-8465-3214-5483",320,LocalDateTime.now(),LocalDateTime.now().plusYears(5));
-			Card card3 = new Card(client2.getFirstName()+" "+client2.getLastName(),CardType.DEBIT, CardColor.SILVER,"5456-1321-4541-8973",110,LocalDateTime.now(),LocalDateTime.now().plusYears(5));
+			Card card1 = new Card(CardType.DEBIT, CardColor.GOLD,"2316-5416-3854-2184",970,LocalDateTime.now(),LocalDateTime.now().plusYears(5));
+			Card card2 = new Card(CardType.CREDIT, CardColor.TITANIUM,"5423-8465-3214-5483",320,LocalDateTime.now(),LocalDateTime.now().plusYears(5));
+			Card card3 = new Card(CardType.DEBIT, CardColor.SILVER,"5456-1321-4541-8973",110,LocalDateTime.now(),LocalDateTime.now().plusYears(5));
 
 			client1.addCard(card1);
 			client1.addCard(card2);
