@@ -28,12 +28,12 @@ public class AccountController {
     private ClientRepository clientRepository;
 
     @RequestMapping("/accounts")
-    public List<AccountDTO> getClients() {
+    public List<AccountDTO> getAccounts() {
         return accountRepository.findAll().stream().map(AccountDTO::new).collect(toList());
     }
 
     @RequestMapping("/accounts/{id}")
-    public AccountDTO getClient(@PathVariable Long id){
+    public AccountDTO getAccount(@PathVariable Long id){
         return accountRepository.findById(id).map(AccountDTO::new).orElse(null);
     }
     @RequestMapping(path ="/clients/current/accounts" ,method = RequestMethod.POST)
