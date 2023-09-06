@@ -75,14 +75,11 @@ public class Account {
         transaction.setAccount(this);
         transactions.add(transaction);
     }
+    public void plusBalance(double amount){
+        balance+=amount;
+    }
 
-    @Override
-    public String toString() {
-        return "Account{" +
-                "accountID=" + accountID +
-                ", number='" + number + '\'' +
-                ", creationDate=" + creationDate +
-                ", balance=" + balance +
-                '}';
+    public void minusBalance(double amount){
+        balance-=amount;
     }
 }

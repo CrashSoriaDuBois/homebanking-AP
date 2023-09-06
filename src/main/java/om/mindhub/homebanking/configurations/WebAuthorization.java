@@ -16,22 +16,30 @@ import javax.servlet.http.HttpSession;
 
 @EnableWebSecurity
 @Configuration
-public class WebAuthorization{
+public class WebAuthorization {
 
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.authorizeRequests()
                 .antMatchers("/web/index.html", "/web/js/index.js", "/web/css/**", "/web/img/**").permitAll()
-                .antMatchers(HttpMethod.POST, "/api/clients").permitAll()
-                .antMatchers("/admin/**","/rest/**,/api/**").hasAuthority("ADMIN")
-                .antMatchers("/**").hasAuthority("CLIENT");
+                .antMatchers(HttpMethod.POST, "/api/login","/api/logout","/api/clients").permitAll()
+                .antMatchers("/web/**","/api/clients/current/accounts","/api/clients/current","/api/clients/current/cards","/api/accounts/{id}").hasAnyAuthority("ADMIN","CLIENT")
+                .antMatchers(HttpMethod.POST, "/api/transactions").hasAnyAuthority("ADMIN","CLIENT")
+                .antMatchers("/admin/**","/rest/**","/api/**").hasAuthority("ADMIN")
+                .anyRequest().denyAll();
 
         http.formLogin()
                 .loginPage("/api/login")
                 .usernameParameter("email")
                 .passwordParameter("password");
-        http.logout().logoutUrl("/api/logout");
+
+        http.logout().logoutUrl("/api/logout").deleteCookies("JSESSIONID");
+
+        //if user is not authenticated,just send a redirect to index.html
+        //http.exceptionHandling().authenticationEntryPoint((req, res, exc) -> res.sendRedirect("/web/index.html"));
+
+        // turn off checking for CSRF tokens
 
         http.csrf().disable();
 

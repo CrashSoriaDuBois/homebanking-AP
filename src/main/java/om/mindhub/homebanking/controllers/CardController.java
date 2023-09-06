@@ -4,16 +4,15 @@ import om.mindhub.homebanking.dtos.CardDTO;
 import om.mindhub.homebanking.enums.CardColor;
 import om.mindhub.homebanking.enums.CardType;
 import om.mindhub.homebanking.models.Card;
+import om.mindhub.homebanking.models.Client;
 import om.mindhub.homebanking.repositories.CardRepository;
 import om.mindhub.homebanking.repositories.ClientRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.web.bind.annotation.*;
 
 import java.text.DecimalFormat;
 import java.time.LocalDateTime;
@@ -30,33 +29,38 @@ public class CardController {
     @Autowired
     private ClientRepository clientRepository;
 
-    @RequestMapping("/cards")
+    @GetMapping("/cards")
     public List<CardDTO> getAllCards(){
         return cardRepository.findAll().stream().map(CardDTO::new).collect(toList());
     }
 
-    @RequestMapping("/clients/current/cards")
-    public List<CardDTO> getCurrentClientCards(Authentication authentication){
-        return cardRepository.findByClientEmail(authentication.getName()).stream().map(CardDTO::new).collect(toList());
+    @GetMapping("/clients/current/cards")
+    public List<CardDTO> getCurrentClientCards(Authentication authentication) {
+        return clientRepository.findByEmail(authentication.getName()).getCards().stream().map(CardDTO::new).collect(toList());
     }
 
-    @RequestMapping(path = "/clients/current/cards",method = RequestMethod.POST)
-    public ResponseEntity<Object> createCurrentCard(@RequestParam String cardType, @RequestParam String cardColor, Authentication authentication){
+    @PostMapping("/clients/current/cards")
+    public ResponseEntity<Object> createCurrentCard(
+            @RequestParam CardType cardType, @RequestParam CardColor cardColor, Authentication authentication){
         //validate
-        if(cardType.isEmpty()) {
-            return new ResponseEntity<>("Missing data: card type is empty", HttpStatus.FORBIDDEN);
+        boolean hasClientAuthority = authentication.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .anyMatch(authority -> authority.equals("CLIENT"));
+        if(!hasClientAuthority) {
+            return new ResponseEntity<>("Unauthorized", HttpStatus.UNAUTHORIZED);
         }
-        if(cardColor.isEmpty()) {
-            return new ResponseEntity<>("Missing data: card color is empty", HttpStatus.FORBIDDEN);
-        }
-        //max of 3 cards
-        if(cardRepository.findByClientEmail(authentication.getName()).size()>=3){
-            return new ResponseEntity<>("User has 3 cards", HttpStatus.FORBIDDEN);
+
+        Client client = clientRepository.findByEmail(authentication.getName());
+
+        if (cardRepository.existsByTypeAndColorAndClient(cardType, cardColor, client)) {
+            return new ResponseEntity<>("card alredy exist", HttpStatus.FORBIDDEN);
         }
         //create card
-        Card newCard=new Card(CardType.valueOf(cardType), CardColor.valueOf(cardColor),generateNumber(),generateCvv(), LocalDateTime.now(),LocalDateTime.now().plusYears(5));
-        newCard.setClient(clientRepository.findByEmail(authentication.getName()));
+        Card newCard = new Card(client.cardHolder(), cardType, cardColor,
+                generateNumber(), generateCvv(), LocalDateTime.now(), LocalDateTime.now().plusYears(5));
+        client.addCard(newCard);
         cardRepository.save(newCard);
+        clientRepository.save(client);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 

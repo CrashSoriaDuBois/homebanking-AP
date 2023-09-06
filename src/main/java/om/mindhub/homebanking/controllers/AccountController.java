@@ -2,16 +2,15 @@ package om.mindhub.homebanking.controllers;
 
 import om.mindhub.homebanking.dtos.AccountDTO;
 import om.mindhub.homebanking.models.Account;
+import om.mindhub.homebanking.models.Client;
 import om.mindhub.homebanking.repositories.AccountRepository;
 import om.mindhub.homebanking.repositories.ClientRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -32,24 +31,44 @@ public class AccountController {
         return accountRepository.findAll().stream().map(AccountDTO::new).collect(toList());
     }
 
-    @RequestMapping("/accounts/{id}")
-    public AccountDTO getAccount(@PathVariable Long id){
-        return accountRepository.findById(id).map(AccountDTO::new).orElse(null);
+    @GetMapping("/accounts/{id}")
+    public ResponseEntity<Object> getClient(@PathVariable Long id, Authentication authentication) {
+        Client client = clientRepository.findByEmail(authentication.getName());
+        Account account = accountRepository.findById(id).orElse(null);
+        if (client== null){
+            return new ResponseEntity<>("Client not found", HttpStatus.FORBIDDEN);
+        }
+        if( account == null){
+            return new ResponseEntity<>("Account not found", HttpStatus.FORBIDDEN);
+        }
+        if (account.getClient().getId().equals(client.getId())) {
+            return new ResponseEntity<>(new AccountDTO(account), HttpStatus.ACCEPTED);
+        }
+        return new ResponseEntity<>("You're  not the owner", HttpStatus.FORBIDDEN);
     }
-    @RequestMapping(path ="/clients/current/accounts" ,method = RequestMethod.POST)
-    public ResponseEntity<Object> createCurrentAccount(Authentication authentication){
+      @PostMapping("/clients/current/accounts")
+     public ResponseEntity<Object> createAccount(Authentication authentication) {
+        //validate CLIENT
+        boolean hasClientAuthority = authentication.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .anyMatch(authority -> authority.equals("CLIENT"));
+        if (!hasClientAuthority) {
+            return new ResponseEntity<>("Unauthorized", HttpStatus.UNAUTHORIZED);
+        }
+        //get client information
+        Client client = clientRepository.findByEmail(authentication.getName());
         //max of accounts
-        if(accountRepository.findByClientEmail(authentication.getName()).size()>=3){
+        if(client.getAccounts().size() >= 3){
             return new ResponseEntity<>("User has 3 accounts", HttpStatus.FORBIDDEN);
         }
-        //create account
-        String accountNumber = createNumberAccount();
-        Account account = new Account(accountNumber, LocalDateTime.now(),0.0);
-        account.setClient(clientRepository.findByEmail(authentication.getName()));
-        accountRepository.save(account);
-        return new ResponseEntity<>(HttpStatus.CREATED);
+          String accountNumber = createNumberAccount();
+          Account newAccount = new Account(accountNumber, LocalDateTime.now(), 0.0);
+          client.addAccount(newAccount);
+          accountRepository.save(newAccount);
+          clientRepository.save(client);
+          return new ResponseEntity<>(HttpStatus.CREATED);
     }
-    private String createNumberAccount(){
+    protected String createNumberAccount(){
         String accountNumber;
         do {
             int random = (int) (Math.random() * 99999999);
@@ -57,9 +76,9 @@ public class AccountController {
         } while (accountRepository.existsByNumber(accountNumber));
         return accountNumber;
     }
-    @RequestMapping(path ="/clients/current/accounts")
+    @GetMapping("/clients/current/accounts")
     public List<AccountDTO> getClientAccount(Authentication authentication){
-        return accountRepository.findByClientEmail(authentication.getName()).stream().map(AccountDTO::new).collect(toList());
+        return clientRepository.findByEmail(authentication.getName()).getAccounts().stream().map(AccountDTO::new).collect(toList());
     }
 
 }

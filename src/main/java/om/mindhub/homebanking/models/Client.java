@@ -81,6 +81,10 @@ public class Client {
         account.setClient(this);
         accounts.add(account);
     }
+    public void addAccount(Account account) {
+        account.setClient(this);
+        accounts.add(account);
+    }
     public Set<ClientLoan> getClientLoans() {
         return clientLoans;
     }
@@ -89,9 +93,6 @@ public class Client {
         clientLoans.add(clientLoan);
     }
 
-    public List<Loan> getLoans(){
-        return clientLoans.stream().map(ClientLoan::getLoan).collect(toList());
-    }
 
     public Set<Card> getCards() {
         return cards;
@@ -101,14 +102,10 @@ public class Client {
         card.setClient(this);
         cards.add(card);
     }
-
-    @Override
-    public String toString() {
-        return "Client{" +
-                "clientID=" + id +
-                ", firstName='" + firstName + '\'' +
-                ", lastName='" + lastName + '\'' +
-                ", email='" + email + '\'' +
-                '}';
+    public List<Loan> getLoans(){
+        return clientLoans.stream().map(ClientLoan::getLoan).collect(toList());
+    }
+    public String cardHolder(){
+        return firstName + " " + lastName;
     }
 }
