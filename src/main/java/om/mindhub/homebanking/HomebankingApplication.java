@@ -46,7 +46,7 @@ public class HomebankingApplication {
 			accountRepository.save(account1);
 			accountRepository.save(account2);
 
-			Client client2 = new Client("Ines", "Risotto", "inesrisotto@gmail.com", passwordEncoder.encode("melba"));
+			Client client2 = new Client("Marina", "Risotto", "inesrisotto@gmail.com", passwordEncoder.encode("melba"));
 			Account account3 = new Account("VIN003", LocalDateTime.now(),2500 );
 			Account account4 = new Account("VIN004", (LocalDateTime.now()).plusDays(1),1000 );
 
