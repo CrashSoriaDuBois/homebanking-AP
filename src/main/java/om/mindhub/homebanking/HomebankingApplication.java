@@ -46,7 +46,7 @@ public class HomebankingApplication {
 			accountRepository.save(account1);
 			accountRepository.save(account2);
 
-			Client client2 = new Client("Ines", "Risotto", "inessirotto@gmail.com", passwordEncoder.encode("melba"));
+			Client client2 = new Client("Ines", "Risotto", "inesrisotto@gmail.com", passwordEncoder.encode("melba"));
 			Account account3 = new Account("VIN003", LocalDateTime.now(),2500 );
 			Account account4 = new Account("VIN004", (LocalDateTime.now()).plusDays(1),1000 );
 
@@ -59,11 +59,11 @@ public class HomebankingApplication {
 			accountRepository.save(account3);
 			accountRepository.save(account4);
 
-			Transaction transaction1 = new Transaction(TransactionType.DEBIT,5000,"description", LocalDateTime.now());
+			Transaction transaction1 = new Transaction(TransactionType.DEBIT,5000,"description", LocalDate.now());
 			transactionRepository.save(transaction1);
 			account1.addTransactions(transaction1);
 
-			Transaction transaction2 = new Transaction(TransactionType.CREDIT,5000,"other description",LocalDateTime.now());
+			Transaction transaction2 = new Transaction(TransactionType.CREDIT,5000,"other description",LocalDate.now());
 			transactionRepository.save(transaction2);
 			account2.addTransactions(transaction2);
 
@@ -77,10 +77,10 @@ public class HomebankingApplication {
 			loanRepository.save(loan1);
 			loanRepository.save(loan2);
 			loanRepository.save(loan3);
-			ClientLoan clientLoan1 = new ClientLoan(loan1.getName(),400000,loan1.getPayments().get(4));
-			ClientLoan clientLoan2 = new ClientLoan(loan2.getName(),50000,loan2.getPayments().get(1));
-			ClientLoan clientLoan3 = new ClientLoan(loan2.getName(),100000,loan2.getPayments().get(2));
-			ClientLoan clientLoan4 = new ClientLoan(loan3.getName(),200000,loan3.getPayments().get(2));
+			ClientLoan clientLoan1 = new ClientLoan(400000,loan1.getPayments().get(4));
+			ClientLoan clientLoan2 = new ClientLoan(50000,loan2.getPayments().get(1));
+			ClientLoan clientLoan3 = new ClientLoan(100000,loan2.getPayments().get(2));
+			ClientLoan clientLoan4 = new ClientLoan(200000,loan3.getPayments().get(2));
 
 
 			loan1.addClientLoan(clientLoan1);

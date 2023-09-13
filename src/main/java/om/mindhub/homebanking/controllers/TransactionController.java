@@ -1,6 +1,7 @@
 package om.mindhub.homebanking.controllers;
 
 
+
 import om.mindhub.homebanking.dtos.TransactionDTO;
 import om.mindhub.homebanking.enums.TransactionType;
 import om.mindhub.homebanking.models.Account;
@@ -8,6 +9,8 @@ import om.mindhub.homebanking.models.Transaction;
 import om.mindhub.homebanking.repositories.AccountRepository;
 import om.mindhub.homebanking.repositories.ClientRepository;
 import om.mindhub.homebanking.repositories.TransactionRepository;
+import om.mindhub.homebanking.services.AccountService;
+import om.mindhub.homebanking.services.TransactionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +19,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -28,18 +32,18 @@ public class TransactionController {
     @Autowired
     private ClientRepository clientRepository;
     @Autowired
-    private AccountRepository accountRepository;
+    private AccountService accountService;
     @Autowired
-    private TransactionRepository transactionRepository;
+    private TransactionService transactionService;
 
     @GetMapping("/transactions")
     public List<TransactionDTO> getTransactions() {
-        return transactionRepository.findAll().stream().map(TransactionDTO::new).collect(toList());
+        return transactionService.getTransactions();
     }
 
     @GetMapping("/transactions/{id}")
     public TransactionDTO getTransaction(@PathVariable Long id) {
-        return transactionRepository.findById(id).map(TransactionDTO::new).orElse(null);
+        return transactionService.getTransaction(id);
     }
 
     @Transactional
@@ -47,15 +51,15 @@ public class TransactionController {
     public ResponseEntity<Object> createCurrentCard(@RequestParam double amount, @RequestParam String
             description, @RequestParam String fromAccountNumber, @RequestParam String toAccountNumber, Authentication authentication) {
         //validate client
-        boolean hasClientAuthority = authentication.getAuthorities().stream()
+     /*   boolean hasClientAuthority = authentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .anyMatch(authority -> authority.equals("CLIENT"));
         if (!hasClientAuthority) {
             return new ResponseEntity<>("Unauthorized", HttpStatus.UNAUTHORIZED);
-        }
+        }     */
         //get accounts
-        Account sourceAccount = accountRepository.findByNumber(fromAccountNumber);
-        Account destinationAccount= accountRepository.findByNumber(toAccountNumber);
+        Account sourceAccount = accountService.findByNumber(fromAccountNumber);
+        Account destinationAccount= accountService.findByNumber(toAccountNumber);
         //validate parameters
         if (amount <= 0) {
             return new ResponseEntity<>("Amount invalid", HttpStatus.FORBIDDEN);
@@ -89,18 +93,18 @@ public class TransactionController {
             return new ResponseEntity<>("Insufficient funds",HttpStatus.FORBIDDEN);
         }
 
-        Transaction debitTransaction=new Transaction(TransactionType.DEBIT,-amount,description, LocalDateTime.now());
-        Transaction creditTransaction=new Transaction(TransactionType.CREDIT,amount,description, LocalDateTime.now());
+        Transaction debitTransaction= transactionService.createDebitTransaction(amount,description);
+        Transaction creditTransaction= transactionService.createCreditTransaction(amount,description);
         sourceAccount.addTransactions(debitTransaction);
         destinationAccount.addTransactions(creditTransaction);
         //change balance
         sourceAccount.minusBalance(amount);
         destinationAccount.plusBalance(amount);
         //save transactions
-        accountRepository.save(sourceAccount);
-        accountRepository.save(destinationAccount);
-        transactionRepository.save(debitTransaction);
-        transactionRepository.save(creditTransaction);
+        accountService.saveAccount(sourceAccount);
+        accountService.saveAccount(destinationAccount);
+        transactionService.saveTransaction(debitTransaction);
+        transactionService.saveTransaction(creditTransaction);
 
         return new ResponseEntity<>(HttpStatus.CREATED);
     }

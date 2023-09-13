@@ -4,6 +4,8 @@ import om.mindhub.homebanking.models.Account;
 import om.mindhub.homebanking.models.Client;
 import om.mindhub.homebanking.repositories.AccountRepository;
 import om.mindhub.homebanking.repositories.ClientRepository;
+import om.mindhub.homebanking.services.AccountService;
+import om.mindhub.homebanking.services.ClientService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,26 +22,24 @@ import static java.util.stream.Collectors.toList;
 @RequestMapping(value = "api")
 public class ClientController {
     @Autowired
-    private ClientRepository cLrepo;
+    private ClientService clientService;
+    @Autowired
+    private AccountService accountService;
     @Autowired
     private PasswordEncoder passwordEncoder;
-    @Autowired
-    private AccountController accountController;
-    @Autowired
-    private AccountRepository accountRepository;
 
     @GetMapping("/clients")
     public List<ClienDTO> getClients() {
-        return cLrepo.findAll().stream().map(ClienDTO::new).collect(toList());
+        return clientService.getClients();
     }
 
     @GetMapping("/clients/{id}")
     public ClienDTO getClient(@PathVariable Long id){
-        return cLrepo.findById(id).map(ClienDTO::new).orElse(null);
+        return clientService.getClient(id);
     }
     @GetMapping("/clients/current")
     public ClienDTO getClientCurrent(Authentication authentication){
-        return new ClienDTO(cLrepo.findByEmail(authentication.getName()));
+        return clientService.getClientCurrent(authentication.getName());
     }
     @PostMapping("/clients")
     public ResponseEntity<Object> registerClient(
@@ -48,20 +48,18 @@ public class ClientController {
         if (firstName.isEmpty() || lastName.isEmpty() || email.isEmpty() || password.isEmpty()) {
             return new ResponseEntity<>("Missing data", HttpStatus.FORBIDDEN);
         }
-        if (cLrepo.findByEmail(email) != null) {
+        if (clientService.findByEmail(email) != null) {
             return new ResponseEntity<>("Name already in use", HttpStatus.FORBIDDEN);
         }
 
-        String accountNumber = accountController.createNumberAccount();
-        //create new account
-        Account account = new Account(accountNumber, LocalDateTime.now(),0.0);
+        Account account = accountService.createAccount();
         //save account
-        accountRepository.save(account);
+        accountService.saveAccount(account);
         //create new client
         Client client = new Client(firstName, lastName, email, passwordEncoder.encode(password));
         client.addAccount(account);
         //save client
-        cLrepo.save(client);
+        clientService.saveClient(client);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 }

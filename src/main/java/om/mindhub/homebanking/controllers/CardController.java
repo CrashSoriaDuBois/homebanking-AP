@@ -7,6 +7,8 @@ import om.mindhub.homebanking.models.Card;
 import om.mindhub.homebanking.models.Client;
 import om.mindhub.homebanking.repositories.CardRepository;
 import om.mindhub.homebanking.repositories.ClientRepository;
+import om.mindhub.homebanking.services.CardService;
+import om.mindhub.homebanking.services.ClientService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,19 +26,20 @@ import static java.util.stream.Collectors.toList;
 @RequestMapping("/api")
 public class CardController {
     @Autowired
-    private CardRepository cardRepository;
+    private ClientService clientService;
 
     @Autowired
-    private ClientRepository clientRepository;
+    private CardService cardService;
 
     @GetMapping("/cards")
     public List<CardDTO> getAllCards(){
-        return cardRepository.findAll().stream().map(CardDTO::new).collect(toList());
+        return cardService.getAllCards();
     }
 
     @GetMapping("/clients/current/cards")
     public List<CardDTO> getCurrentClientCards(Authentication authentication) {
-        return clientRepository.findByEmail(authentication.getName()).getCards().stream().map(CardDTO::new).collect(toList());
+        Client currentClient= clientService.findByEmail(authentication.getName());
+        return currentClient.getCards().stream().map(CardDTO::new).collect(toList());
     }
 
     @PostMapping("/clients/current/cards")
@@ -50,34 +53,18 @@ public class CardController {
             return new ResponseEntity<>("Unauthorized", HttpStatus.UNAUTHORIZED);
         }
 
-        Client client = clientRepository.findByEmail(authentication.getName());
+        Client client = clientService.findByEmail(authentication.getName());
 
-        if (cardRepository.existsByTypeAndColorAndClient(cardType, cardColor, client)) {
+        if (cardService.existsByTypeAndColorAndClient(cardType, cardColor, client)) {
             return new ResponseEntity<>("card alredy exist", HttpStatus.FORBIDDEN);
         }
-        //create card
-        Card newCard = new Card(client.cardHolder(), cardType, cardColor,
-                generateNumber(), generateCvv(), LocalDateTime.now(), LocalDateTime.now().plusYears(5));
+
+        Card newCard = cardService.createCard(client.cardHolder(),cardType,cardColor);
         client.addCard(newCard);
-        cardRepository.save(newCard);
-        clientRepository.save(client);
+        cardService.saveCard(newCard);
+        clientService.saveClient(client);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
-    private int generateCvv(){
-        return (int) (Math.random() * 999);
-    }
-
-    private String generateNumber(){
-        DecimalFormat format=new DecimalFormat("0000");
-        String number="";
-        for(int i=0;i<4;i++){
-            number += format.format((int)(Math.random() * 9999));
-            if(i!=3){
-                number+="-";
-            }
-        }
-        return number;
-    }
 
 }

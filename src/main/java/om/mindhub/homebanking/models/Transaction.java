@@ -4,6 +4,7 @@ import om.mindhub.homebanking.enums.TransactionType;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -17,17 +18,17 @@ public class Transaction {
     private TransactionType type;
     private double amount;
     private String description;
-    private LocalDateTime date;
+    private LocalDate date;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name="account_id")
+    @JoinColumn(name="accountId")
     private Account account;
 
     Transaction(){
 
     }
 
-    public Transaction(TransactionType type, double amount, String description, LocalDateTime date) {
+    public Transaction(TransactionType type, double amount, String description, LocalDate date) {
         this.type = type;
         this.amount = amount;
         this.description = description;
@@ -58,10 +59,10 @@ public class Transaction {
         this.description = description;
     }
 
-    public LocalDateTime getDate() {
+    public LocalDate getDate() {
         return date;
     }
-    public void setDate(LocalDateTime date) {
+    public void setDate(LocalDate date) {
         this.date = date;
     }
 

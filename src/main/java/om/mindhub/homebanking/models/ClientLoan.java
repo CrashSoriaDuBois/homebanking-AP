@@ -11,7 +11,6 @@ public class ClientLoan {
     @GeneratedValue(strategy = GenerationType.AUTO, generator = "native")
     @GenericGenerator(name = "native", strategy = "native")
     private Long id;
-    private String name;
     private double amount;
     private Integer payment;
 
@@ -26,22 +25,13 @@ public class ClientLoan {
     public ClientLoan() {
     }
 
-    public ClientLoan(String name, double amount, Integer payment) {
-        this.name = name;
+    public ClientLoan(double amount, Integer payment) {
         this.amount = amount;
         this.payment = payment;
     }
 
     public Long getId() {
         return id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 
     public double getAmount() {
